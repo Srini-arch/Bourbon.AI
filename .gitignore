@@ -46,14 +46,16 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# 4. Local Database & SQLite WAL files
-data/
-data/*
+# 4. Local Database & SQLite WAL files (Root data only)
+/data/
+/data/*
 *.db
 *.db-shm
 *.db-wal
 *.sqlite
 *.sqlite3
+!frontend/src/data/
+!frontend/src/data/**
 
 # 5. Production Outputs, Generated Client Campaigns, Internal Audits
 outputs/

@@ -1,0 +1,125 @@
+[
+  {
+    "id": "orator-cutting-midway-pauses",
+    "client_name": "Unbox-ED",
+    "product_name": "Orator Unbox-ED",
+    "category": "Public Speaking & Oratory",
+    "core_fact": "Replacing filler words ('umms' and 'aaas') with deep-breath intentional silences ('Cutting Midway') builds instant stage authority, reducing glossophobia anxiety.",
+    "student_outcome": "Overcomes speaking paralysis; students master intentional speech pacing and reduce verbal fillers by 80% within 4 live sessions.",
+    "pedagogical_context": "Live cadence drills: Mentors train students to take silent diaphragmatic breaths whenever encountering a cognitive pause rather than uttering filler vocalizations.",
+    "target_audience": "Grades 3-10, Parents, Educators",
+    "keywords": [
+      "glossophobia",
+      "speech mechanics",
+      "cutting midway",
+      "stage presence",
+      "filler elimination"
+    ],
+    "teaching_differentiator": "Founder-trained master mentors providing 1:1 cadence feedback in small cohorts capped at 4-6 students.",
+    "proof_metric": "75% baseline glossophobia reduction; 93% of perceived speaking impact derived from vocal tone and non-verbal poise.",
+    "lesson_format": "Live 1:1 and Small-Group Interactive Cohort",
+    "release_date": "2026-07-01"
+  },
+  {
+    "id": "orator-peel-impromptu-speech",
+    "client_name": "Unbox-ED",
+    "product_name": "Orator Unbox-ED",
+    "category": "Public Speaking & Oratory",
+    "core_fact": "The PEEL framework (Point, Evidence, Explain, Link) provides a structured mental scaffolding for spontaneous, impromptu arguments without note cards.",
+    "student_outcome": "Delivers structured 60-second spontaneous presentations with clear thesis, persuasive evidence, and confident conclusion.",
+    "pedagogical_context": "Impromptu spotlight challenges: Students are given surprise topics and 30 seconds to mentally outline using the 4 PEEL anchors before presenting.",
+    "target_audience": "Grades 3-10, Parents, Debate Coaches",
+    "keywords": [
+      "impromptu speaking",
+      "PEEL framework",
+      "critical thinking",
+      "debate structure"
+    ],
+    "teaching_differentiator": "Gamified extemporaneous speaking arena replacing dry rote speech recitation.",
+    "proof_metric": "92% of students construct structured multi-point arguments within 2 weeks of PEEL mastery.",
+    "lesson_format": "Live Interactive Debate Cohort",
+    "release_date": "2026-07-01"
+  },
+  {
+    "id": "writer-5-sense-show-dont-tell",
+    "client_name": "Unbox-ED",
+    "product_name": "Writer Unbox-ED",
+    "category": "Creative Writing",
+    "core_fact": "'Show, Don't Tell!' engages readers through 5-sense sensory anchoring (Sight, Sound, Touch, Taste, Smell) rather than flat declarative exposition.",
+    "student_outcome": "Eliminates passive statements ('he was angry'); students craft visceral sensory scenes ('his knuckles turned white against the wooden desk').",
+    "pedagogical_context": "Sensory translation studio: Students take bland sentences and reconstruct them by evoking at least two specific physical sensory triggers.",
+    "target_audience": "Grades 3-10, Parents, English Educators",
+    "keywords": [
+      "show not tell",
+      "sensory writing",
+      "creative fluency",
+      "descriptive depth"
+    ],
+    "teaching_differentiator": "20+ year veteran educator pedagogy replacing 5-paragraph formulaic templates with organic creative immersion.",
+    "proof_metric": "100% elimination of passive statements; students create active imagery in under 2 minutes of sensory journaling.",
+    "lesson_format": "Interactive Creative Writing Workshop",
+    "release_date": "2026-07-01"
+  },
+  {
+    "id": "writer-cognitive-observation-blank-page",
+    "client_name": "Unbox-ED",
+    "product_name": "Writer Unbox-ED",
+    "category": "Creative Writing",
+    "core_fact": "Observation is the cognitive foundation of descriptive writing. Training children to notice environmental micro-details breaks through blank-page anxiety.",
+    "student_outcome": "Instantly overcomes writer's block; children transition from fear of a blank page to self-directed storytelling with distinctive personal voice.",
+    "pedagogical_context": "Deductive observation warm-ups: Describing mystery objects through tactile and visual clues without naming them directly.",
+    "target_audience": "Grades 3-10, Parents",
+    "keywords": [
+      "blank page anxiety",
+      "observation drills",
+      "writer's block",
+      "creative confidence"
+    ],
+    "teaching_differentiator": "Inquiry-led sensory discovery rather than rote grammar drill sheets.",
+    "proof_metric": "3x increase in descriptive vocabulary richness and complete elimination of blank-page hesitation.",
+    "lesson_format": "Small-Group Sensory Sprints",
+    "release_date": "2026-07-01"
+  },
+  {
+    "id": "finance-purchasing-power-inflation",
+    "client_name": "Unbox-ED",
+    "product_name": "Finance Unbox-ED",
+    "category": "Financial Literacy",
+    "core_fact": "Money evolved from barter to gold and modern fiat currency. Low, stable inflation fuels economic growth while hyperinflation erodes purchasing power.",
+    "student_outcome": "Grasps real vs nominal money value; understands why idle cash loses purchasing power over time using the 20-year Big Mac index.",
+    "pedagogical_context": "Interactive trade simulation: Students experience barter double-coincidence friction before transacting with pegged fiat currency.",
+    "target_audience": "Grades 6-10, Parents, Economics Mentors",
+    "keywords": [
+      "purchasing power",
+      "inflation",
+      "fiat currency",
+      "barter system",
+      "economic literacy"
+    ],
+    "teaching_differentiator": "Simulated experiential marketplace where students physically experience supply, demand, and currency depreciation.",
+    "proof_metric": "50% purchasing power erosion demonstrated across 20-year fiat cycles.",
+    "lesson_format": "Hands-on Marketplace Simulation",
+    "release_date": "2026-07-01"
+  },
+  {
+    "id": "finance-compound-interest-stewardship",
+    "client_name": "Unbox-ED",
+    "product_name": "Finance Unbox-ED",
+    "category": "Financial Literacy",
+    "core_fact": "Compound interest is the exponential engine of wealth creation; early disciplined saving vastly outstrips late high-earning contributions.",
+    "student_outcome": "Distinguishes assets from liabilities, resists short-term impulse spending, and plans practical savings milestones.",
+    "pedagogical_context": "Interactive compounding game: Comparing a $100 monthly investment starting at age 15 vs starting at age 30.",
+    "target_audience": "Grades 6-10, Parents",
+    "keywords": [
+      "compound interest",
+      "assets vs liabilities",
+      "wealth creation",
+      "delayed gratification",
+      "smart saving"
+    ],
+    "teaching_differentiator": "Age-appropriate real-world simulation grounded in everyday decision-making, not abstract Wall Street jargon.",
+    "proof_metric": "100% comprehension of exponential time-value-of-money vs instant consumer gratification.",
+    "lesson_format": "Interactive Capital Simulation",
+    "release_date": "2026-07-01"
+  }
+]
