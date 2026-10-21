@@ -40,6 +40,45 @@ const API_BASE = typeof window !== 'undefined' && window.location.port === '5173
 
 const BRAND_PALETTE_SWATCHES = ['#F5A623', '#FFFFFF', '#0B132B', '#1C2541', '#4B9BFF', '#10B981'];
 
+const DEFAULT_UNBOXED_SLIDES = [
+  {
+    slide_id: 1,
+    headline: "Overcoming Stage Fright in Middle Schoolers",
+    accent: "Unbox It.",
+    copy: "75% of speech impact comes from vocal tone and non-verbal poise, not rote slides. Our 'Cutting Midway' breath technique builds instant stage presence.",
+    cta: "Book a Free Discovery Demo",
+    template_type: "ambient_bottom",
+    font_size: 42,
+    accent_font_size: 50,
+    banner_opacity: 0.88,
+    accent_color: "#F5A623"
+  },
+  {
+    slide_id: 2,
+    headline: "5-Sense Sensory Writing That Hooks Readers",
+    accent: "Show, Don't Tell.",
+    copy: "Replacing flat telling sentences with vivid sensory triggers eliminates blank-page anxiety in under two minutes of journaling.",
+    cta: "Claim Free Writing Workshop",
+    template_type: "ambient_bottom",
+    font_size: 42,
+    accent_font_size: 50,
+    banner_opacity: 0.88,
+    accent_color: "#F5A623"
+  },
+  {
+    slide_id: 3,
+    headline: "Real-World Money & Purchasing Power for Teens",
+    accent: "Think Wealth.",
+    copy: "Understanding fiat inflation vs compound interest gives students practical financial stewardship before high school.",
+    cta: "Explore Finance Unbox-ED",
+    template_type: "ambient_bottom",
+    font_size: 42,
+    accent_font_size: 50,
+    banner_opacity: 0.88,
+    accent_color: "#F5A623"
+  }
+];
+
 export default function CreativeStudio({
   clientData,
   activeTrend,
@@ -53,7 +92,7 @@ export default function CreativeStudio({
   const [activeCampaignId, setActiveCampaignId] = useState('campaign_2');
   const [activeCampaignTitle, setActiveCampaignTitle] = useState('Campaign 2: Unbox It Series');
   const [campaignType, setCampaignType] = useState('carousel'); // 'carousel' or 'batch'
-  const [slides, setSlides] = useState([]);
+  const [slides, setSlides] = useState(DEFAULT_UNBOXED_SLIDES);
   const [activeSlide, setActiveSlide] = useState(0);
   const [briefForSprint, setBriefForSprint] = useState(null);
 
@@ -62,13 +101,13 @@ export default function CreativeStudio({
 
   // Active Slide Compositing State (Phase 2)
   const [templateType, setTemplateType] = useState('ambient_bottom');
-  const [mainHeadline, setMainHeadline] = useState('');
+  const [mainHeadline, setMainHeadline] = useState(DEFAULT_UNBOXED_SLIDES[0].headline);
   const [accentCallout, setAccentCallout] = useState('Unbox It.');
-  const [fontSize, setFontSize] = useState(44);
-  const [accentFontSize, setAccentFontSize] = useState(52);
+  const [fontSize, setFontSize] = useState(42);
+  const [accentFontSize, setAccentFontSize] = useState(50);
   const [bannerOpacity, setBannerOpacity] = useState(0.88);
   const [accentColor, setAccentColor] = useState('#F5A623');
-  const [copyText, setCopyText] = useState('');
+  const [copyText, setCopyText] = useState(DEFAULT_UNBOXED_SLIDES[0].copy);
   const [ctaText, setCtaText] = useState('Claim Free Interactive Session');
 
   // Active Slide GenAI State (Phase 1)
@@ -226,10 +265,16 @@ export default function CreativeStudio({
         setActiveSlide(targetIdx);
         syncSlideToLocalControls(data.slides[targetIdx]);
         showToast(`📁 Loaded campaign '${data.campaign_title}' (${data.slides.length} .bbn items).`);
+      } else {
+        setSlides(DEFAULT_UNBOXED_SLIDES);
+        setActiveSlide(0);
+        syncSlideToLocalControls(DEFAULT_UNBOXED_SLIDES[0]);
       }
     } catch (err) {
-      console.error('Failed to load campaign:', err);
-      showToast('Error loading campaign from disk.');
+      console.warn('Campaign API offline, using bundled Unbox-ED campaign slides:', err);
+      setSlides(DEFAULT_UNBOXED_SLIDES);
+      setActiveSlide(0);
+      syncSlideToLocalControls(DEFAULT_UNBOXED_SLIDES[0]);
     } finally {
       setLoadingPreview(false);
     }

@@ -32,11 +32,16 @@ export default function KnowledgeStudio({ clientData }) {
   const clientName = clientData?.name || 'Unbox-ED';
 
   // Analytics & Permutations State
-  const [analytics, setAnalytics] = useState(null);
+  const [analytics, setAnalytics] = useState({
+    status: 'ok',
+    total_facts: defaultFacts.length,
+    verified_programs: 3,
+    vector_stats: { total_vectors: defaultFacts.length }
+  });
   const [loadingAnalytics, setLoadingAnalytics] = useState(false);
 
-  // Facts Table State
-  const [facts, setFacts] = useState([]);
+  // Facts Table State - initialized with curated defaultFacts
+  const [facts, setFacts] = useState(defaultFacts);
   const [loadingFacts, setLoadingFacts] = useState(false);
   const [selectedProductFilter, setSelectedProductFilter] = useState('All Brand Offerings');
   const [searchQuery, setSearchQuery] = useState('');
@@ -83,12 +88,12 @@ export default function KnowledgeStudio({ clientData }) {
         setAnalytics(data);
       }
     } catch (err) {
-      console.warn('KM analytics API offline, using bundled capacity metrics:', err);
+      console.warn('KM analytics API offline, using curated capacity metrics:', err);
       setAnalytics({
         status: 'ok',
         total_facts: defaultFacts.length,
         verified_programs: 3,
-        vector_stats: { total_vectors: 42 }
+        vector_stats: { total_vectors: defaultFacts.length }
       });
     } finally {
       setLoadingAnalytics(false);
@@ -113,7 +118,7 @@ export default function KnowledgeStudio({ clientData }) {
         setFacts(filtered);
       }
     } catch (err) {
-      console.warn('Facts API offline, using bundled 37 curriculum facts:', err);
+      console.warn('Facts API offline, using bundled curated curriculum facts:', err);
       const filtered = selectedProductFilter === 'All Brand Offerings'
         ? defaultFacts
         : defaultFacts.filter(f => f.product_name === selectedProductFilter);
@@ -244,14 +249,22 @@ export default function KnowledgeStudio({ clientData }) {
     );
   });
 
+  const numFacts = facts.length || defaultFacts.length || 6;
+  const numFunnels = 5;
+  const numHooks = 5;
+  const numFormats = 4;
+  const numVisuals = 8;
+  const totalPermutations = numFacts * numFunnels * numHooks * numFormats * numVisuals;
+  const runwayYears = (totalPermutations / 365).toFixed(1);
+
   const formula = analytics?.permutation_formula || {
-    num_facts: 37,
-    num_funnel_stages: 5,
-    num_hooks: 5,
-    num_formats: 4,
-    num_visual_presets: 8,
-    total_permutations: 29600,
-    content_runway_years: 81.1
+    num_facts: numFacts,
+    num_funnel_stages: numFunnels,
+    num_hooks: numHooks,
+    num_formats: numFormats,
+    num_visual_presets: numVisuals,
+    total_permutations: totalPermutations,
+    content_runway_years: runwayYears
   };
 
   return (

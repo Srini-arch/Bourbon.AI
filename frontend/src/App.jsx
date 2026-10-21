@@ -40,6 +40,7 @@ import BbnFileExplorer from './components/BbnFileExplorer';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AdminLogin from './components/AdminLogin';
+import { UNBOX_ED_BRAND_DATA } from './data/defaultBrandData';
 
 const DRAWER_WIDTH = 260;
 const API_BASE = typeof window !== 'undefined' && window.location.port === '5173' ? 'http://localhost:8000' : '';
@@ -52,8 +53,15 @@ export default function App() {
     return typeof window !== 'undefined' ? (localStorage.getItem('bourbon_username') || 'admin') : 'admin';
   });
 
-  const [activeTab, setActiveTab] = useState('studio');
-  const [clientData, setClientData] = useState(null);
+  // Default active tab is Brand KYC as the central cockpit
+  const [activeTab, setActiveTab] = useState('kyc');
+  const [clientData, setClientData] = useState(() => {
+    try {
+      const saved = localStorage.getItem('bourbon_kyc_Unbox-ED');
+      if (saved) return JSON.parse(saved);
+    } catch (_) {}
+    return UNBOX_ED_BRAND_DATA;
+  });
   const [clientsList, setClientsList] = useState(['Unbox-ED']);
   const [selectedClient, setSelectedClient] = useState('Unbox-ED');
   const [healthStatus, setHealthStatus] = useState('ok');
@@ -101,31 +109,19 @@ export default function App() {
       // Fetch specific client info
       const clientRes = await fetch(`${API_BASE}/api/clients`);
       const clientInfo = await clientRes.json();
-      setClientData(clientInfo.client_data);
+      if (clientInfo && clientInfo.client_data) {
+        setClientData(clientInfo.client_data);
+      }
     } catch (err) {
-      console.warn('Backend API offline, loading default Unbox-ED brand dossier:', err);
-      setClientData({
-        name: "Unbox-ED",
-        industry: "EdTech",
-        brand_voice: "Empathetic, Visionary, and Rigorous",
-        brand_vision: "Transforming foundational learning into lifelong creative agency.",
-        brand_mission: "Empowering children with hands-on expressive and oratorical confidence.",
-        brand_focus: "Hands-on sensory writing, oratorical speech mechanics, and foundational finance",
-        brand_messaging: "Tactile learning breaks through blank-page anxiety.",
-        tone_formality: 6,
-        cta_preference: "Explore the Unbox-ED Method",
-        target_audience: ["Parents of 8-14 year olds", "Educators"],
-        donts: ["Do not use generic corporate jargon like synergy, leverage, utilize.", "Do not make unsupported claims."],
-        usps: {
-          products: [
-            { name: "Orator Unbox-ED", student_age_group: "Grades 3-10" },
-            { name: "Writer Unbox-ED", student_age_group: "Grades 3-8" },
-            { name: "Finance Unbox-ED", student_age_group: "Grades 5-10" }
-          ],
-          services: ["1:1 Orator Mentorship", "Micro-Cohort Sensory Sprints"],
-          ips: ["Child-Centric Experiential Learning Methodology"]
+      console.warn('Backend API offline, loading sovereign Unbox-ED brand dossier:', err);
+      try {
+        const saved = localStorage.getItem('bourbon_kyc_Unbox-ED');
+        if (saved) {
+          setClientData(JSON.parse(saved));
+          return;
         }
-      });
+      } catch (_) {}
+      setClientData(UNBOX_ED_BRAND_DATA);
     }
   };
 
@@ -143,14 +139,14 @@ export default function App() {
   }, []);
 
   const navItems = [
+    { id: 'kyc', label: 'Brand KYC Dossier', sub: 'DNA, Voice, USPs & Visuals (Cockpit)', icon: <BusinessIcon /> },
     { id: 'studio', label: 'BBN Creative Studio', sub: '1–50 Posts & Carousels • Hermite Compositing', icon: <LayersIcon /> },
-    { id: 'bbn_explorer', label: '.BBN File Explorer', sub: 'Search, Sort & Batch Delete', icon: <FolderOpenIcon /> },
+    { id: 'knowledge', label: 'Deep Knowledge Base', sub: '6 Flagship Curricula • 4.8K Permutations', icon: <MenuBookIcon /> },
     { id: 'director', label: 'Content Director', sub: 'Interactive Brief Writer', icon: <EditNoteIcon /> },
+    { id: 'bbn_explorer', label: '.BBN File Explorer', sub: 'Search, Sort & Batch Delete', icon: <FolderOpenIcon /> },
     { id: 'trends', label: 'Trendscraper', sub: 'Swarm Intelligence', icon: <TrendingUpIcon /> },
     { id: 'settings', label: 'Image Agent & Settings', sub: 'Multi-Engine & API Vault', icon: <TuneIcon /> },
-    { id: 'knowledge', label: 'Knowledge Base', sub: 'KM AI & Permutations', icon: <MenuBookIcon /> },
     { id: 'governance', label: 'Review & Governance', sub: 'SLA Telemetry & Approvals', icon: <VerifiedUserIcon /> },
-    { id: 'kyc', label: 'Brand KYC Dossier', sub: 'DNA, Voice & Guardrails', icon: <BusinessIcon /> },
     { id: 'concierge', label: 'Ask Bourbon.AI', sub: 'AI Concierge & Status', icon: <SmartToyIcon /> },
   ];
 
@@ -199,40 +195,37 @@ export default function App() {
             </Box>
 
             <Stack direction="row" spacing={1.5} alignItems="center">
-              {/* Interactive Client Switcher Dropdown */}
-              <FormControl size="small" sx={{ minWidth: 170 }}>
-                <Select
-                  value={selectedClient}
-                  onChange={(e) => {
-                    if (e.target.value === '__add_new__') {
-                      setClientRegisterOpen(true);
-                    } else {
-                      handleSwitchClient(e.target.value);
+              {/* Active Brand Interactive Badge -> Opens Brand KYC */}
+              <Tooltip title="Operating Brand: Unbox-ED. Click to open Brand KYC Dossier.">
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<BusinessIcon sx={{ color: '#F5A623', fontSize: 16 }} />}
+                  onClick={() => setActiveTab('kyc')}
+                  sx={{
+                    color: '#F0F3F6',
+                    borderColor: 'rgba(245, 166, 35, 0.4)',
+                    backgroundColor: 'rgba(245, 166, 35, 0.08)',
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    height: 32,
+                    px: 1.5,
+                    textTransform: 'none',
+                    borderRadius: 1.5,
+                    '&:hover': {
+                      borderColor: '#F5A623',
+                      backgroundColor: 'rgba(245, 166, 35, 0.16)'
                     }
                   }}
-                  sx={{
-                    color: '#4B9BFF',
-                    fontWeight: 700,
-                    fontSize: '0.8rem',
-                    backgroundColor: 'rgba(24, 119, 242, 0.15)',
-                    border: '1px solid #1877F2',
-                    height: 32,
-                    '& .MuiSvgIcon-root': { color: '#4B9BFF' }
-                  }}
                 >
-                  {clientsList.map(c => (
-                    <MenuItem key={c} value={c}>Active: {c}</MenuItem>
-                  ))}
-                  <Divider sx={{ my: 0.5 }} />
-                  <MenuItem value="__add_new__" sx={{ color: '#F5A623', fontWeight: 700, fontSize: '0.8rem' }}>
-                    ➕ Register New Brand...
-                  </MenuItem>
-                </Select>
-              </FormControl>
+                  Brand: <span style={{ color: '#F5A623', marginLeft: 4 }}>{clientData?.name || selectedClient || 'Unbox-ED'}</span>
+                </Button>
+              </Tooltip>
+
               <Chip
                 icon={<CheckCircleIcon sx={{ fontSize: '14px !important' }} />}
-                label={healthStatus === 'ok' ? 'APIs Operational' : 'Offline'}
-                color={healthStatus === 'ok' ? 'success' : 'error'}
+                label={healthStatus === 'ok' ? 'APIs Operational' : 'Offline Mode'}
+                color={healthStatus === 'ok' ? 'success' : 'warning'}
                 size="small"
                 variant="outlined"
                 sx={{ fontWeight: 700 }}
@@ -356,15 +349,30 @@ export default function App() {
           </List>
 
           <Box sx={{ mt: 'auto', p: 2 }}>
-            <Paper sx={{ p: 1.5, borderRadius: 2, background: 'rgba(20, 23, 31, 0.7)' }}>
-              <Typography variant="caption" sx={{ color: '#94A3B8', display: 'block', mb: 0.5 }}>
-                Active Client
+            <Paper
+              onClick={() => setActiveTab('kyc')}
+              sx={{
+                p: 1.5,
+                borderRadius: 2,
+                background: 'rgba(20, 23, 31, 0.7)',
+                cursor: 'pointer',
+                border: '1px solid rgba(245, 166, 35, 0.2)',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  borderColor: '#F5A623',
+                  background: 'rgba(245, 166, 35, 0.08)'
+                }
+              }}
+            >
+              <Typography variant="caption" sx={{ color: '#94A3B8', display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
+                <span>Active Brand</span>
+                <span style={{ color: '#10B981', fontWeight: 700, fontSize: '0.65rem' }}>● KYC Active</span>
               </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 700, color: '#F5A623' }}>
+              <Typography variant="body2" sx={{ fontWeight: 800, color: '#F5A623' }}>
                 {clientData?.name || 'Unbox-ED'}
               </Typography>
               <Typography variant="caption" sx={{ color: '#64748B', display: 'block' }}>
-                Standard Logo Badge: 203×69px
+                Click to edit KYC Profile & Guardrails
               </Typography>
             </Paper>
           </Box>

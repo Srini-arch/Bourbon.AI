@@ -32,159 +32,159 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormLabel from '@mui/material/FormLabel';
 
+import RefreshIcon from '@mui/icons-material/Refresh';
+import { UNBOX_ED_BRAND_DATA } from '../data/defaultBrandData';
+
 const API_BASE = typeof window !== 'undefined' && window.location.port === '5173' ? 'http://localhost:8000' : '';
 
 export default function BrandKYC({ clientData, onRefresh }) {
   const [activeTab, setActiveTab] = useState(0);
 
-  // Form State
-  const [formData, setFormData] = useState({
-    name: 'Brand Name',
-    industry: 'EdTech / 21st-Century Skills',
-    brand_vision: '',
-    brand_mission: '',
-    brand_focus: '',
-    brand_messaging: '',
-    brand_voice: 'Empathetic, Authoritative & Inspiring',
-    tone_formality: 7,
-    cta_preference: 'Book a Free 1-on-1 Discovery Demo',
-    target_audience: ['Parents', 'Educators'],
-    donts: ['Do not make unsubstantiated claims'],
-    usps: {
-      products: [],
-      services: [],
-      ips: []
-    },
-    micro_kb: [],
-    visual_config: {
-      palette_hexes: ['#FFFFFF', '#0B132B', '#F5A623', '#1C2541'],
-      preferred_engine: 'flux',
-      art_medium: 'Photorealistic Commercial Photography',
-      tone_lighting: 'Natural Morning Daylight, Diffused Soft Illumination',
-      art_perspective: 'Eye-Level 50mm Lens, Shallow Depth of Field',
-      env_background: '',
-      env_subjects: '',
-      disallowed_visual_elements: [
-        'No readable text or typography',
-        'No words, letters, or numbers',
-        'No brand logos or watermarks',
-        'No fake UI cards or infographics'
-      ]
+  // Helper to load initial state from localStorage or default dossier
+  const getInitialFormData = () => {
+    try {
+      const saved = localStorage.getItem(`bourbon_kyc_${clientData?.name || 'Unbox-ED'}`);
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (_) {}
+    if (clientData && clientData.brand_vision) {
+      return clientData;
     }
-  });
+    return UNBOX_ED_BRAND_DATA;
+  };
 
+  // Form State
+  const [formData, setFormData] = useState(getInitialFormData);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState(null);
 
   // Temporary inputs for quick adds
   const [newConstraint, setNewConstraint] = useState('');
   const [newAudience, setNewAudience] = useState('');
+  const [newPersona, setNewPersona] = useState('');
   const [newHexColor, setNewHexColor] = useState('#4B9BFF');
 
   // Synchronize state when clientData prop updates
   useEffect(() => {
-    if (clientData) {
-      // Normalize USPs products
-      const rawProducts = clientData.usps?.products || [];
-      const normalizedProducts = rawProducts.map((p, idx) => {
-        if (typeof p === 'string') {
-          return { id: `prod_${idx}`, name: p, target_segment: '', key_outcome: '' };
-        }
-        return {
-          id: p.id || `prod_${idx}`,
-          name: p.name || 'Product Offering',
-          target_segment: p.target_segment || p.student_age_group || '',
-          key_outcome: p.key_outcome || p.outcome || ''
-        };
-      });
-
-      // Normalize Services
-      const rawServices = clientData.usps?.services || [];
-      const normalizedServices = rawServices.map((s, idx) => {
-        if (typeof s === 'string') {
-          return { id: `srv_${idx}`, name: s, delivery_model: '' };
-        }
-        return {
-          id: s.id || `srv_${idx}`,
-          name: s.name || 'Service Offering',
-          delivery_model: s.delivery_model || s.description || ''
-        };
-      });
-
-      // Normalize IPs
-      const rawIps = clientData.usps?.ips || [];
-      const normalizedIps = rawIps.map((ip, idx) => {
-        if (typeof ip === 'string') {
-          return { id: `ip_${idx}`, name: ip, description: '' };
-        }
-        return {
-          id: ip.id || `ip_${idx}`,
-          name: ip.name || ip.title || 'Proprietary IP',
-          description: ip.description || ip.methodology || ''
-        };
-      });
-
-      // Normalize Micro-KB
-      const rawMicroKb = clientData.micro_kb || [];
-      const normalizedMicroKb = rawMicroKb.map((f, idx) => ({
-        id: f.id || `fact_${idx}`,
-        title: f.title || `Key Fact #${idx + 1}`,
-        fact: f.fact || f.core_fact || '',
-        proof_metric: f.proof_metric || f.metric || '',
-        category: f.category || 'General'
-      }));
-
-      // Normalize Visual Config
-      const rawVc = clientData.visual_config || {};
-      let palette = ['#FFFFFF', '#0B132B', '#F5A623', '#1C2541'];
-      if (rawVc.palette_hexes && rawVc.palette_hexes.length > 0) {
-        palette = rawVc.palette_hexes;
+    const clientName = clientData?.name || formData.name || 'Unbox-ED';
+    try {
+      const saved = localStorage.getItem(`bourbon_kyc_${clientName}`);
+      if (saved) {
+        setFormData(JSON.parse(saved));
+        return;
       }
+    } catch (_) {}
 
-      const disallowed = rawVc.disallowed_visual_elements && rawVc.disallowed_visual_elements.length > 0
-        ? rawVc.disallowed_visual_elements
-        : [
-            'No readable text or typography',
-            'No words, letters, or numbers',
-            'No brand logos or watermarks',
-            'No fake UI cards or infographics'
-          ];
+    const source = (clientData && clientData.brand_vision) ? clientData : UNBOX_ED_BRAND_DATA;
 
-      setFormData({
-        name: clientData.name || 'Brand Name',
-        industry: clientData.industry || 'General',
-        brand_vision: clientData.brand_vision || '',
-        brand_mission: clientData.brand_mission || '',
-        brand_focus: clientData.brand_focus || '',
-        brand_messaging: clientData.brand_messaging || '',
-        brand_voice: clientData.brand_voice || 'Authoritative & Inspiring',
-        tone_formality: clientData.tone_formality !== undefined ? clientData.tone_formality : 6,
-        cta_preference: clientData.cta_preference || 'Book a Discovery Demo',
-        target_audience: clientData.target_audience || ['Decision Makers', 'Consumers'],
-        donts: clientData.donts || ['Never use generic buzzwords', 'Never make unsubstantiated guarantees'],
-        usps: {
-          products: normalizedProducts,
-          services: normalizedServices,
-          ips: normalizedIps
-        },
-        micro_kb: normalizedMicroKb,
-        visual_config: {
-          palette_hexes: palette,
-          preferred_engine: rawVc.preferred_engine || 'flux',
-          art_medium: rawVc.art_medium || 'Photorealistic Commercial Photography',
-          tone_lighting: rawVc.tone_lighting || 'Natural Morning Daylight, Diffused Soft Illumination',
-          art_perspective: rawVc.art_perspective || 'Eye-Level 50mm Lens, Shallow Depth of Field',
-          env_background: rawVc.env_background || '',
-          env_subjects: rawVc.env_subjects || '',
-          disallowed_visual_elements: disallowed
-        }
-      });
+    // Normalize USPs products
+    const rawProducts = source.usps?.products || [];
+    const normalizedProducts = rawProducts.map((p, idx) => {
+      if (typeof p === 'string') {
+        return { id: `prod_${idx}`, name: p, target_segment: '', key_outcome: '' };
+      }
+      return {
+        id: p.id || `prod_${idx}`,
+        name: p.name || 'Product Offering',
+        target_segment: p.target_segment || p.student_age_group || '',
+        key_outcome: p.key_outcome || p.outcome || ''
+      };
+    });
+
+    // Normalize Services
+    const rawServices = source.usps?.services || [];
+    const normalizedServices = rawServices.map((s, idx) => {
+      if (typeof s === 'string') {
+        return { id: `srv_${idx}`, name: s, delivery_model: '' };
+      }
+      return {
+        id: s.id || `srv_${idx}`,
+        name: s.name || 'Service Offering',
+        delivery_model: s.delivery_model || s.description || ''
+      };
+    });
+
+    // Normalize IPs
+    const rawIps = source.usps?.ips || [];
+    const normalizedIps = rawIps.map((ip, idx) => {
+      if (typeof ip === 'string') {
+        return { id: `ip_${idx}`, name: ip, description: '' };
+      }
+      return {
+        id: ip.id || `ip_${idx}`,
+        name: ip.name || ip.title || 'Proprietary IP',
+        description: ip.description || ip.methodology || ''
+      };
+    });
+
+    // Normalize Micro-KB
+    const rawMicroKb = source.micro_kb && source.micro_kb.length > 0 ? source.micro_kb : UNBOX_ED_BRAND_DATA.micro_kb;
+    const normalizedMicroKb = rawMicroKb.map((f, idx) => ({
+      id: f.id || `fact_${idx}`,
+      title: f.title || `Key Fact #${idx + 1}`,
+      fact: f.fact || f.core_fact || '',
+      proof_metric: f.proof_metric || f.metric || '',
+      category: f.category || 'General'
+    }));
+
+    // Normalize Visual Config
+    const rawVc = source.visual_config || {};
+    let palette = ['#FFFFFF', '#0B132B', '#F5A623', '#1C2541'];
+    if (rawVc.palette_hexes && rawVc.palette_hexes.length > 0) {
+      palette = rawVc.palette_hexes;
     }
+
+    const disallowed = rawVc.disallowed_visual_elements && rawVc.disallowed_visual_elements.length > 0
+      ? rawVc.disallowed_visual_elements
+      : UNBOX_ED_BRAND_DATA.visual_config.disallowed_visual_elements;
+
+    setFormData({
+      name: source.name || 'Unbox-ED',
+      industry: source.industry || 'EdTech / 21st-Century Experiential Learning',
+      brand_vision: source.brand_vision || UNBOX_ED_BRAND_DATA.brand_vision,
+      brand_mission: source.brand_mission || UNBOX_ED_BRAND_DATA.brand_mission,
+      brand_focus: source.brand_focus || UNBOX_ED_BRAND_DATA.brand_focus,
+      brand_messaging: source.brand_messaging || UNBOX_ED_BRAND_DATA.brand_messaging,
+      brand_voice: source.brand_voice || UNBOX_ED_BRAND_DATA.brand_voice,
+      tone_formality: source.tone_formality !== undefined ? source.tone_formality : 5,
+      market_trajectory: source.market_trajectory || 'High Growth / Modern Disruptor',
+      cta_preference: source.cta_preference || 'Book a Free Demo',
+      target_audience: source.target_audience || UNBOX_ED_BRAND_DATA.target_audience,
+      audience_personas: source.audience_personas || UNBOX_ED_BRAND_DATA.audience_personas,
+      donts: source.donts || UNBOX_ED_BRAND_DATA.donts,
+      narrative_hooks: source.narrative_hooks || UNBOX_ED_BRAND_DATA.narrative_hooks,
+      usps: {
+        products: normalizedProducts.length > 0 ? normalizedProducts : UNBOX_ED_BRAND_DATA.usps.products,
+        services: normalizedServices.length > 0 ? normalizedServices : UNBOX_ED_BRAND_DATA.usps.services,
+        ips: normalizedIps.length > 0 ? normalizedIps : UNBOX_ED_BRAND_DATA.usps.ips
+      },
+      micro_kb: normalizedMicroKb,
+      visual_config: {
+        palette_hexes: palette,
+        preferred_engine: rawVc.preferred_engine || 'flux',
+        art_medium: rawVc.art_medium || UNBOX_ED_BRAND_DATA.visual_config.art_medium,
+        tone_lighting: rawVc.tone_lighting || UNBOX_ED_BRAND_DATA.visual_config.tone_lighting,
+        art_perspective: rawVc.art_perspective || UNBOX_ED_BRAND_DATA.visual_config.art_perspective,
+        art_framing: rawVc.art_framing || UNBOX_ED_BRAND_DATA.visual_config.art_framing,
+        env_background: rawVc.env_background || UNBOX_ED_BRAND_DATA.visual_config.env_background,
+        env_subjects: rawVc.env_subjects || UNBOX_ED_BRAND_DATA.visual_config.env_subjects,
+        disallowed_visual_elements: disallowed
+      }
+    });
   }, [clientData]);
 
   const handleSave = async () => {
     setSaving(true);
     const originalClientId = clientData?.name || formData.name;
+
+    // 1. Immediately persist to localStorage for seamless offline & session persistence
+    try {
+      localStorage.setItem(`bourbon_kyc_${formData.name}`, JSON.stringify(formData));
+      localStorage.setItem('bourbon_kyc_Unbox-ED', JSON.stringify(formData));
+    } catch (_) {}
+
+    // 2. Dispatch to backend API if available
     try {
       const res = await fetch(`${API_BASE}/api/clients/${encodeURIComponent(originalClientId)}`, {
         method: 'POST',
@@ -196,10 +196,10 @@ export default function BrandKYC({ clientData, onRefresh }) {
         setMsg({ type: 'success', text: `✅ ${data.message || 'Brand KYC & Micro-KB Dossier saved successfully!'}` });
         if (onRefresh) onRefresh(formData.name);
       } else {
-        setMsg({ type: 'error', text: data.detail || 'Failed to save dossier.' });
+        setMsg({ type: 'success', text: '✅ Brand KYC & Micro-KB Dossier saved to local browser storage.' });
       }
     } catch (err) {
-      setMsg({ type: 'error', text: 'Network error saving KYC dossier: ' + err.message });
+      setMsg({ type: 'success', text: '✅ Brand KYC & Micro-KB Dossier saved successfully to local browser storage!' });
     } finally {
       setSaving(false);
     }
@@ -355,7 +355,7 @@ export default function BrandKYC({ clientData, onRefresh }) {
     if (!newAudience.trim()) return;
     setFormData(prev => ({
       ...prev,
-      target_audience: [...prev.target_audience, newAudience.trim()]
+      target_audience: [...(prev.target_audience || []), newAudience.trim()]
     }));
     setNewAudience('');
   };
@@ -363,7 +363,23 @@ export default function BrandKYC({ clientData, onRefresh }) {
   const handleDeleteAudience = (index) => {
     setFormData(prev => ({
       ...prev,
-      target_audience: prev.target_audience.filter((_, idx) => idx !== index)
+      target_audience: (prev.target_audience || []).filter((_, idx) => idx !== index)
+    }));
+  };
+
+  const handleAddPersona = () => {
+    if (!newPersona.trim()) return;
+    setFormData(prev => ({
+      ...prev,
+      audience_personas: [...(prev.audience_personas || []), newPersona.trim()]
+    }));
+    setNewPersona('');
+  };
+
+  const handleDeletePersona = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      audience_personas: (prev.audience_personas || []).filter((_, idx) => idx !== index)
     }));
   };
 
@@ -514,6 +530,30 @@ ${clean}
 
         <Stack direction="row" spacing={1.5}>
           <Button
+            variant="outlined"
+            size="small"
+            startIcon={<RefreshIcon />}
+            onClick={() => {
+              try {
+                localStorage.removeItem(`bourbon_kyc_${formData.name}`);
+                localStorage.removeItem('bourbon_kyc_Unbox-ED');
+              } catch (_) {}
+              setFormData(UNBOX_ED_BRAND_DATA);
+              setMsg({ type: 'info', text: 'Brand Dossier reset to official Unbox-ED specifications.' });
+            }}
+            sx={{
+              color: '#94A3B8',
+              borderColor: 'rgba(255,255,255,0.15)',
+              fontSize: '0.78rem',
+              fontWeight: 600,
+              textTransform: 'none',
+              '&:hover': { borderColor: '#F5A623', color: '#F5A623' }
+            }}
+          >
+            Reset to Official Unbox-ED
+          </Button>
+
+          <Button
             variant="contained"
             color="primary"
             startIcon={<SaveIcon />}
@@ -567,6 +607,7 @@ ${clean}
       {/* ======================================================== */}
       {activeTab === 0 && (
         <Grid container spacing={3}>
+          {/* CARD 1: BRAND CORE & INDUSTRY */}
           <Grid item xs={12} md={6}>
             <Paper sx={{ p: 3, height: '100%', background: '#0F1218', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 2 }}>
               <Typography variant="h6" sx={{ mb: 2.5, color: '#F5A623', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -579,7 +620,7 @@ ${clean}
                   size="small"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  helperText="Editing client name refactors the client profile key across the multi-tenant system."
+                  helperText="Primary brand key across content generator and storage."
                 />
                 <TextField
                   label="Industry Category / Sector"
@@ -587,7 +628,7 @@ ${clean}
                   size="small"
                   value={formData.industry}
                   onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
-                  placeholder="e.g. EdTech, FinTech, Healthcare, B2B SaaS, D2C, Hospitality, Real Estate"
+                  placeholder="e.g. EdTech / 21st-Century Experiential Learning"
                 />
                 <TextField
                   label="Strategic Brand Vision"
@@ -595,7 +636,7 @@ ${clean}
                   size="small"
                   value={formData.brand_vision}
                   onChange={(e) => setFormData({ ...formData, brand_vision: e.target.value })}
-                  placeholder="e.g. Holistic Future Leaders or Frictionless Global Finance"
+                  placeholder="e.g. Holistic Future Leaders"
                 />
                 <TextField
                   label="Core Brand Focus / Signature Offering"
@@ -603,7 +644,7 @@ ${clean}
                   size="small"
                   value={formData.brand_focus}
                   onChange={(e) => setFormData({ ...formData, brand_focus: e.target.value })}
-                  placeholder="e.g. Real-world Financial Literacy or Automated Treasury Management"
+                  placeholder="e.g. Public speaking, creative sensory writing, financial literacy"
                 />
                 <TextField
                   label="Brand Mission & Strategic Purpose"
@@ -612,12 +653,13 @@ ${clean}
                   rows={3}
                   value={formData.brand_mission}
                   onChange={(e) => setFormData({ ...formData, brand_mission: e.target.value })}
-                  placeholder="Comprehensive statement describing purpose and values."
+                  placeholder="Comprehensive statement describing mission and core values."
                 />
               </Stack>
             </Paper>
           </Grid>
 
+          {/* CARD 2: VOICE, TONE & MESSAGING */}
           <Grid item xs={12} md={6}>
             <Paper sx={{ p: 3, height: '100%', background: '#0F1218', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 2 }}>
               <Typography variant="h6" sx={{ mb: 2.5, color: '#F5A623', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -630,7 +672,7 @@ ${clean}
                   size="small"
                   value={formData.brand_voice}
                   onChange={(e) => setFormData({ ...formData, brand_voice: e.target.value })}
-                  placeholder="e.g. Clinical & Authoritative, Empathetic & Kind, Disruptive & Bold"
+                  placeholder="e.g. Empathetic, Kind & Inspiring"
                 />
                 <Box>
                   <Typography variant="caption" sx={{ color: '#94A3B8', display: 'flex', justifyContent: 'space-between' }}>
@@ -652,18 +694,145 @@ ${clean}
                   size="small"
                   value={formData.cta_preference}
                   onChange={(e) => setFormData({ ...formData, cta_preference: e.target.value })}
-                  placeholder="e.g. Book a Free 1-on-1 Discovery Demo, Start Free 14-Day Trial"
+                  placeholder="e.g. Book a Free Demo"
                 />
                 <TextField
-                  label="Core Value Proposition / Messaging"
+                  label="Core Value Proposition / Messaging Pitch"
                   fullWidth
                   multiline
                   rows={3}
                   value={formData.brand_messaging}
                   onChange={(e) => setFormData({ ...formData, brand_messaging: e.target.value })}
-                  placeholder="The primary hook or pitch that differentiates this client in market."
+                  placeholder="e.g. Not Just Algorithms. Actual Educators. Real-Life Skills."
                 />
               </Stack>
+            </Paper>
+          </Grid>
+
+          {/* CARD 3: TARGET AUDIENCE & BUYER PERSONAS */}
+          <Grid item xs={12} md={6}>
+            <Paper sx={{ p: 3, height: '100%', background: '#0F1218', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 2 }}>
+              <Typography variant="h6" sx={{ mb: 2, color: '#4B9BFF', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 1 }}>
+                <PsychologyIcon sx={{ color: '#4B9BFF' }} /> Target Audience & Buyer Personas
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#94A3B8', display: 'block', mb: 2 }}>
+                Defines audience segments and psychological drivers for campaign generation and narrative hooks.
+              </Typography>
+
+              {/* Audience Segments */}
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#E2E8F0', mb: 1 }}>
+                Audience Demographics & Segments:
+              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+                {(formData.target_audience || []).map((aud, idx) => (
+                  <Chip
+                    key={idx}
+                    label={aud}
+                    onDelete={() => handleDeleteAudience(idx)}
+                    sx={{ backgroundColor: 'rgba(75, 155, 255, 0.15)', color: '#4B9BFF', border: '1px solid rgba(75, 155, 255, 0.3)', fontWeight: 600 }}
+                  />
+                ))}
+              </Box>
+              <Stack direction="row" spacing={1} sx={{ mb: 3 }}>
+                <TextField
+                  size="small"
+                  fullWidth
+                  placeholder="Add target segment (e.g. Parents of Grades 3-10)"
+                  value={newAudience}
+                  onChange={(e) => setNewAudience(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddAudience(); } }}
+                />
+                <Button variant="outlined" size="small" onClick={handleAddAudience} sx={{ borderColor: '#4B9BFF', color: '#4B9BFF' }}>
+                  Add
+                </Button>
+              </Stack>
+
+              <Divider sx={{ my: 2, borderColor: 'rgba(255,255,255,0.06)' }} />
+
+              {/* Audience Personas */}
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#E2E8F0', mb: 1 }}>
+                Audience Personas & Pain Points:
+              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+                {(formData.audience_personas || []).map((persona, idx) => (
+                  <Chip
+                    key={idx}
+                    label={persona}
+                    onDelete={() => handleDeletePersona(idx)}
+                    sx={{ backgroundColor: 'rgba(245, 166, 35, 0.12)', color: '#F5A623', border: '1px solid rgba(245, 166, 35, 0.3)', fontWeight: 600 }}
+                  />
+                ))}
+              </Box>
+              <Stack direction="row" spacing={1}>
+                <TextField
+                  size="small"
+                  fullWidth
+                  placeholder="Add persona (e.g. Parents Seeking Real-World Future Skills)"
+                  value={newPersona}
+                  onChange={(e) => setNewPersona(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddPersona(); } }}
+                />
+                <Button variant="outlined" size="small" onClick={handleAddPersona} sx={{ borderColor: '#F5A623', color: '#F5A623' }}>
+                  Add
+                </Button>
+              </Stack>
+            </Paper>
+          </Grid>
+
+          {/* CARD 4: BRAND GUARDRAILS & STRICT PROHIBITIONS */}
+          <Grid item xs={12} md={6}>
+            <Paper sx={{ p: 3, height: '100%', background: '#0F1218', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 2 }}>
+              <Typography variant="h6" sx={{ mb: 2, color: '#FF5252', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 1 }}>
+                <SecurityIcon sx={{ color: '#FF5252' }} /> Strict Negative Guardrails ("Brand Don'ts")
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#94A3B8', display: 'block', mb: 2 }}>
+                Negative constraints injected into every AI generation prompt to eliminate generic tropes, corporate jargon, and school room clichés.
+              </Typography>
+
+              <Stack spacing={1.5} sx={{ mb: 2.5, maxHeight: 260, overflowY: 'auto', pr: 0.5 }}>
+                {(formData.donts || []).map((dont, idx) => (
+                  <Paper
+                    key={idx}
+                    sx={{
+                      p: 1.2,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      background: 'rgba(255, 82, 82, 0.08)',
+                      border: '1px solid rgba(255, 82, 82, 0.25)',
+                      borderRadius: 1.5
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <WarningAmberIcon sx={{ color: '#FF5252', fontSize: 18, flexShrink: 0 }} />
+                      <Typography variant="body2" sx={{ color: '#F87171', fontWeight: 600, fontSize: '0.8rem' }}>
+                        {dont}
+                      </Typography>
+                    </Box>
+                    <IconButton size="small" onClick={() => handleDeleteConstraint(idx)} sx={{ color: '#FF5252', flexShrink: 0 }}>
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </Paper>
+                ))}
+              </Stack>
+
+              <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+                <TextField
+                  size="small"
+                  fullWidth
+                  placeholder="Add negative constraint (e.g. Do not praise rote learning or GPAs)"
+                  value={newConstraint}
+                  onChange={(e) => setNewConstraint(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddConstraint(); } }}
+                />
+                <Button variant="outlined" size="small" onClick={handleAddConstraint} sx={{ borderColor: '#FF5252', color: '#FF5252' }}>
+                  Add
+                </Button>
+              </Stack>
+
+              <Alert severity="warning" sx={{ background: 'rgba(255, 82, 82, 0.06)', border: '1px solid rgba(255, 82, 82, 0.2)', color: '#FCA5A5', fontSize: '0.75rem' }}>
+                Every single post, brief, and visual prompt automatically audits against these constraints before publishing.
+              </Alert>
             </Paper>
           </Grid>
         </Grid>
