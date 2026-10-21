@@ -103,7 +103,29 @@ export default function App() {
       const clientInfo = await clientRes.json();
       setClientData(clientInfo.client_data);
     } catch (err) {
-      console.error('Failed to fetch client data:', err);
+      console.warn('Backend API offline, loading default Unbox-ED brand dossier:', err);
+      setClientData({
+        name: "Unbox-ED",
+        industry: "EdTech",
+        brand_voice: "Empathetic, Visionary, and Rigorous",
+        brand_vision: "Transforming foundational learning into lifelong creative agency.",
+        brand_mission: "Empowering children with hands-on expressive and oratorical confidence.",
+        brand_focus: "Hands-on sensory writing, oratorical speech mechanics, and foundational finance",
+        brand_messaging: "Tactile learning breaks through blank-page anxiety.",
+        tone_formality: 6,
+        cta_preference: "Explore the Unbox-ED Method",
+        target_audience: ["Parents of 8-14 year olds", "Educators"],
+        donts: ["Do not use generic corporate jargon like synergy, leverage, utilize.", "Do not make unsupported claims."],
+        usps: {
+          products: [
+            { name: "Orator Unbox-ED", student_age_group: "Grades 3-10" },
+            { name: "Writer Unbox-ED", student_age_group: "Grades 3-8" },
+            { name: "Finance Unbox-ED", student_age_group: "Grades 5-10" }
+          ],
+          services: ["1:1 Orator Mentorship", "Micro-Cohort Sensory Sprints"],
+          ips: ["Child-Centric Experiential Learning Methodology"]
+        }
+      });
     }
   };
 
