@@ -8,6 +8,7 @@ Zero proprietary algorithm source code is required or distributed.
 import os
 import sys
 import time
+import secrets
 from pathlib import Path
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -58,18 +59,17 @@ class AuthLoginRequest(BaseModel):
 class AuthLogoutRequest(BaseModel):
     token: str
 
+# Generate secure temporary key if ADMIN_PASSWORD is not set
+DYNAMIC_ADMIN_KEY = os.getenv("ADMIN_PASSWORD") or secrets.token_urlsafe(12)
+
 @app.post("/api/auth/login")
 def api_auth_login(req: AuthLoginRequest):
     username = req.username.strip()
     password = req.password.strip()
 
-    admin_pass = os.getenv("ADMIN_PASSWORD", "bourbon2026")
-    allowed_credentials = {
-        "admin": admin_pass,
-        "unbox_admin": "unboxed2026",
-    }
+    admin_pass = os.getenv("ADMIN_PASSWORD") or DYNAMIC_ADMIN_KEY
 
-    if username in allowed_credentials and allowed_credentials[username] == password:
+    if username == "admin" and password == admin_pass:
         token = manage_session("create", client="Unbox-ED", username=username)
         return {
             "success": True,
@@ -130,5 +130,9 @@ if __name__ == "__main__":
     print("  ☕ BOURBON.AI STUDIO — IP-PROTECTED PUBLIC LAUNCHER")
     print("=" * 65)
     print("  Serving React MUI Frontend & APIs on http://localhost:8000")
-    print("  Admin Key: bourbon2026\n")
+    if os.getenv("ADMIN_PASSWORD"):
+        print("  Admin Key: [Configured via ADMIN_PASSWORD environment variable]\n")
+    else:
+        print(f"  Temporary Local Admin Key: {DYNAMIC_ADMIN_KEY}")
+        print("  (Tip: Set ADMIN_PASSWORD in environment to use a custom key)\n")
     uvicorn.run(app, host="0.0.0.0", port=8000)

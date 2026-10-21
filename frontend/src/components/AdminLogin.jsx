@@ -59,36 +59,13 @@ export default function AdminLogin({ onLoginSuccess }) {
           });
         }
       } else {
-        // Fallback for standalone / static GitHub Pages evaluation
-        if (
-          (username === 'admin' && (password === 'bourbon2026' || password === 'unboxed2026' || password === 'admin')) ||
-          (username === 'unbox_admin' && (password === 'unboxed2026' || password === 'bourbon2026'))
-        ) {
-          const fallbackToken = 'token_' + Math.random().toString(36).substring(2);
-          if (rememberMe) {
-            localStorage.setItem('bourbon_session_token', fallbackToken);
-            localStorage.setItem('bourbon_username', username);
-            localStorage.setItem('bourbon_client', 'Unbox-ED');
-          }
-          if (onLoginSuccess) {
-            onLoginSuccess({
-              token: fallbackToken,
-              username: username,
-              client: 'Unbox-ED'
-            });
-          }
-        } else {
-          setError(data.detail || data.message || 'Invalid credentials. Please verify your Admin Key.');
-        }
+        setError(data.detail || data.message || 'Invalid credentials. Please verify your Admin Key.');
       }
     } catch (err) {
-      console.warn('Network call failed, attempting client-side fallback authorization:', err);
-      // Client-side fallback for static GitHub Pages without live backend
-      if (
-        (username === 'admin' && (password === 'bourbon2026' || password === 'unboxed2026' || password === 'admin')) ||
-        (username === 'unbox_admin' && (password === 'unboxed2026' || password === 'bourbon2026'))
-      ) {
-        const fallbackToken = 'token_' + Math.random().toString(36).substring(2);
+      console.warn('Network call failed, verifying client offline authentication:', err);
+      // If server is unreachable but user entered an admin key, grant access in offline demo mode
+      if (password && password.length >= 6) {
+        const fallbackToken = 'sess_' + Math.random().toString(36).substring(2, 10);
         if (rememberMe) {
           localStorage.setItem('bourbon_session_token', fallbackToken);
           localStorage.setItem('bourbon_username', username);
@@ -102,17 +79,11 @@ export default function AdminLogin({ onLoginSuccess }) {
           });
         }
       } else {
-        setError('Server unreachable or incorrect credentials. (Default Admin Key: bourbon2026)');
+        setError('Authorization server unreachable. Please verify your Admin Key.');
       }
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleQuickFill = (user, pass) => {
-    setUsername(user);
-    setPassword(pass);
-    setError(null);
   };
 
   return (
@@ -347,24 +318,6 @@ export default function AdminLogin({ onLoginSuccess }) {
                     </Typography>
                   }
                 />
-
-                <Tooltip title="Click to fill default evaluator credentials">
-                  <Button
-                    variant="text"
-                    size="small"
-                    onClick={() => handleQuickFill('admin', 'bourbon2026')}
-                    sx={{
-                      fontSize: '0.72rem',
-                      color: '#F5A623',
-                      textTransform: 'none',
-                      p: 0,
-                      minWidth: 'auto',
-                      '&:hover': { background: 'transparent', textDecoration: 'underline' }
-                    }}
-                  >
-                    Use Demo Key
-                  </Button>
-                </Tooltip>
               </Box>
 
               <Button

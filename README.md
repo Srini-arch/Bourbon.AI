@@ -6,7 +6,7 @@
 [![Backend: FastAPI Async](https://img.shields.io/badge/Backend-FastAPI%20Async-009688)](https://fastapi.tiangolo.com/)
 
 > **Live Web Application:** [https://srini-arch.github.io/Bourbon.AI/](https://srini-arch.github.io/Bourbon.AI/)  
-> **Master Admin Key:** `bourbon2026`
+> **Access Gateway:** Master Administrator Gate (Single Admin Login)
 
 ---
 
@@ -60,7 +60,7 @@ The unified dashboard will be accessible at **`http://localhost:8000`**.
 
 ### 4. Admin Access
 - **Identifier:** `admin`
-- **Master Key:** `bourbon2026`
+- **Security Key:** Configured via `ADMIN_PASSWORD` environment variable (or automatically generated on local server launch).
 
 ---
 
