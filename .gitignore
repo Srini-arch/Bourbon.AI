@@ -1,0 +1,86 @@
+# ==============================================================================
+# Bourbon.AI - Public Repository Security & IP Protection GitIgnore
+# ==============================================================================
+
+# 1. Environment & API Secrets (CRITICAL)
+.env
+.env.*
+*.env
+auth_config.json
+client_secrets*.json
+service_account*.json
+*.pem
+*.key
+*.cert
+
+# 2. Python Build & Bytecode Artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 3. Node & Frontend Artifacts
+node_modules/
+.npm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# 4. Local Database & SQLite WAL files
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+data/*.db*
+data/cache/
+data/engine_probe_logs.json
+data/telemetry.json
+
+# 5. Production Outputs, Generated Client Campaigns, Internal Audits
+outputs/
+logs/
+server_err.log
+server_out.log
+scratch/
+staging_images/
+
+# 6. OS & Editor Metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 7. Protect Proprietary Algorithms (Allow only compiled binaries & public wrappers)
+# Raw core source algorithms are never committed to the public branch
+src/generator.py
+src/adjudicator.py
+src/image_agent.py
+src/orchestrator.py
+src/unified_vector_db.py
+src/trend_engine/
+src/sfa_engine.py
+src/static_network.py
