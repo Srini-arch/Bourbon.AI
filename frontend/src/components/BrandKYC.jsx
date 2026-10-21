@@ -34,6 +34,7 @@ import FormLabel from '@mui/material/FormLabel';
 
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { UNBOX_ED_BRAND_DATA } from '../data/defaultBrandData';
+import { logActivity } from '../utils/telemetryLogger';
 
 const API_BASE = typeof window !== 'undefined' && window.location.port === '5173' ? 'http://localhost:8000' : '';
 
@@ -182,6 +183,12 @@ export default function BrandKYC({ clientData, onRefresh }) {
     try {
       localStorage.setItem(`bourbon_kyc_${formData.name}`, JSON.stringify(formData));
       localStorage.setItem('bourbon_kyc_Unbox-ED', JSON.stringify(formData));
+      logActivity('KYC', 'BRAND_DOSSIER_SAVED', {
+        brand: formData.name,
+        products_count: formData.usps?.products?.length || 0,
+        services_count: formData.usps?.services?.length || 0,
+        micro_kb_count: formData.micro_kb?.length || 0
+      });
     } catch (_) {}
 
     // 2. Dispatch to backend API if available

@@ -1,48 +1,48 @@
 {
-    "build_timestamp": "2026-10-21 06:26:22 UTC",
+    "build_timestamp": "2026-10-21 09:23:39 UTC",
     "python_runtime": "3.14.0",
     "protection_tier": "Precompiled Bytecode (Source Stripped -OO)",
     "modules": [
         {
             "name": "generator",
             "binary_file": "generator.pyc",
-            "size_kb": 15.13,
+            "size_kb": 15.12,
             "source_included": false
         },
         {
             "name": "adjudicator",
             "binary_file": "adjudicator.pyc",
-            "size_kb": 12.12,
+            "size_kb": 12.11,
             "source_included": false
         },
         {
             "name": "image_agent",
             "binary_file": "image_agent.pyc",
-            "size_kb": 32.39,
+            "size_kb": 32.38,
             "source_included": false
         },
         {
             "name": "orchestrator",
             "binary_file": "orchestrator.pyc",
-            "size_kb": 69.79,
+            "size_kb": 69.78,
             "source_included": false
         },
         {
             "name": "unified_vector_db",
             "binary_file": "unified_vector_db.pyc",
-            "size_kb": 20.52,
+            "size_kb": 20.5,
             "source_included": false
         },
         {
             "name": "sfa_engine",
             "binary_file": "sfa_engine.pyc",
-            "size_kb": 4.91,
+            "size_kb": 4.9,
             "source_included": false
         },
         {
             "name": "static_network",
             "binary_file": "static_network.pyc",
-            "size_kb": 5.85,
+            "size_kb": 5.84,
             "source_included": false
         }
     ]

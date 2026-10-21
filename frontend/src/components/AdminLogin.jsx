@@ -12,6 +12,7 @@ import ShieldIcon from '@mui/icons-material/Shield';
 import KeyIcon from '@mui/icons-material/Key';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import CoffeeIcon from '@mui/icons-material/LocalCafe';
+import { logActivity } from '../utils/telemetryLogger';
 
 const API_BASE = typeof window !== 'undefined' && window.location.port === '5173' ? 'http://localhost:8000' : '';
 
@@ -51,6 +52,11 @@ export default function AdminLogin({ onLoginSuccess }) {
           localStorage.setItem('bourbon_username', data.username || username);
           localStorage.setItem('bourbon_client', data.client || 'Unbox-ED');
         }
+        logActivity('AUTH', 'ADMIN_LOGIN_SUCCESS', {
+          auth_mode: 'API_BACKEND',
+          username: data.username || username,
+          client: data.client || 'Unbox-ED'
+        });
         if (onLoginSuccess) {
           onLoginSuccess({
             token: data.token,
@@ -59,6 +65,9 @@ export default function AdminLogin({ onLoginSuccess }) {
           });
         }
       } else {
+        logActivity('AUTH', 'ADMIN_LOGIN_FAILED', {
+          reason: data.detail || 'Invalid credentials'
+        });
         setError(data.detail || data.message || 'Invalid credentials. Please verify your Admin Key.');
       }
     } catch (err) {
@@ -71,6 +80,11 @@ export default function AdminLogin({ onLoginSuccess }) {
           localStorage.setItem('bourbon_username', username);
           localStorage.setItem('bourbon_client', 'Unbox-ED');
         }
+        logActivity('AUTH', 'ADMIN_LOGIN_SUCCESS', {
+          auth_mode: 'GITHUB_PAGES_STANDALONE',
+          username: username,
+          client: 'Unbox-ED'
+        });
         if (onLoginSuccess) {
           onLoginSuccess({
             token: fallbackToken,
@@ -79,6 +93,9 @@ export default function AdminLogin({ onLoginSuccess }) {
           });
         }
       } else {
+        logActivity('AUTH', 'ADMIN_LOGIN_REJECTED', {
+          reason: 'Key length insufficient or network unreachable'
+        });
         setError('Authorization server unreachable. Please verify your Admin Key.');
       }
     } finally {

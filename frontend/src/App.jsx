@@ -41,6 +41,9 @@ import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AdminLogin from './components/AdminLogin';
 import { UNBOX_ED_BRAND_DATA } from './data/defaultBrandData';
+import { logActivity, exportLogsAsFile } from './utils/telemetryLogger';
+import HistoryIcon from '@mui/icons-material/History';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
 
 const DRAWER_WIDTH = 260;
 const API_BASE = typeof window !== 'undefined' && window.location.port === '5173' ? 'http://localhost:8000' : '';
@@ -75,9 +78,16 @@ export default function App() {
     if (authData.client) {
       setSelectedClient(authData.client);
     }
+    logActivity('AUTH', 'ADMIN_SESSION_ESTABLISHED', {
+      user: authData.username || 'admin',
+      client: authData.client || 'Unbox-ED'
+    });
   };
 
   const handleLogout = async () => {
+    logActivity('AUTH', 'ADMIN_SESSION_LOCKED', {
+      user: currentUser
+    });
     try {
       if (sessionToken) {
         await fetch(`${API_BASE}/api/auth/logout`, {
@@ -92,7 +102,16 @@ export default function App() {
     setSessionToken(null);
   };
 
+  const handleSelectTab = (tabId) => {
+    logActivity('NAVIGATION', 'TAB_ACCESSED', {
+      target_tab: tabId,
+      previous_tab: activeTab
+    });
+    setActiveTab(tabId);
+  };
+
   const handleLaunchTrendCampaign = (trendTitle) => {
+    logActivity('CAMPAIGN', 'TREND_SPRINT_INITIATED', { trend: trendTitle });
     setSelectedTrendForSprint(trendTitle);
     setActiveTab('studio');
   };
@@ -231,6 +250,32 @@ export default function App() {
                 sx={{ fontWeight: 700 }}
               />
 
+              {/* Telemetry Activity Log Exporter */}
+              <Tooltip title="Export Live Activity & Login Audit Log (JSON)">
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<HistoryIcon sx={{ fontSize: 16 }} />}
+                  onClick={exportLogsAsFile}
+                  sx={{
+                    color: '#60A5FA',
+                    borderColor: 'rgba(96, 165, 250, 0.4)',
+                    backgroundColor: 'rgba(96, 165, 250, 0.08)',
+                    fontSize: '0.75rem',
+                    textTransform: 'none',
+                    height: 32,
+                    fontWeight: 700,
+                    px: 1.5,
+                    '&:hover': {
+                      borderColor: '#60A5FA',
+                      backgroundColor: 'rgba(96, 165, 250, 0.16)'
+                    }
+                  }}
+                >
+                  Logs
+                </Button>
+              </Tooltip>
+
               {/* Admin Session Indicator & Logout */}
               <Tooltip title={`Authenticated as Admin: ${currentUser}. Click to lock session.`}>
                 <Button
@@ -309,7 +354,7 @@ export default function App() {
                 <ListItem key={item.id} disablePadding sx={{ mb: 0.8 }}>
                   <ListItemButton
                     selected={selected}
-                    onClick={() => setActiveTab(item.id)}
+                    onClick={() => handleSelectTab(item.id)}
                     sx={{
                       borderRadius: 2,
                       py: 1.2,
