@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import {
   ThemeProvider, CssBaseline, Box, Drawer, AppBar, Toolbar, Typography,
   List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider,
-  IconButton, Chip, Stack, Button, Tooltip, Paper
+  IconButton, Chip, Stack, Button, Tooltip, Paper,
+  Dialog, DialogTitle, DialogContent, DialogActions, TextField, Alert
 } from '@mui/material';
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -40,13 +41,16 @@ import BbnFileExplorer from './components/BbnFileExplorer';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AdminLogin from './components/AdminLogin';
+import TelemetryAuditLedger from './components/TelemetryAuditLedger';
 import { UNBOX_ED_BRAND_DATA } from './data/defaultBrandData';
 import { logActivity, exportLogsAsFile } from './utils/telemetryLogger';
+import { getApiBase, setApiBase } from './apiConfig';
 import HistoryIcon from '@mui/icons-material/History';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import LinkIcon from '@mui/icons-material/Link';
+import SecurityIcon from '@mui/icons-material/Security';
 
 const DRAWER_WIDTH = 260;
-const API_BASE = typeof window !== 'undefined' && window.location.port === '5173' ? 'http://localhost:8000' : '';
 
 export default function App() {
   const [sessionToken, setSessionToken] = useState(() => {
@@ -71,6 +75,10 @@ export default function App() {
   const [selectedTrendForSprint, setSelectedTrendForSprint] = useState(null);
   const [briefForStudio, setBriefForStudio] = useState(null);
   const [clientRegisterOpen, setClientRegisterOpen] = useState(false);
+  const [endpointModalOpen, setEndpointModalOpen] = useState(false);
+  const [customEndpointInput, setCustomEndpointInput] = useState(() => {
+    return typeof window !== 'undefined' ? (localStorage.getItem('bourbon_api_endpoint') || '') : '';
+  });
 
   const handleLoginSuccess = (authData) => {
     setSessionToken(authData.token);
@@ -166,6 +174,7 @@ export default function App() {
     { id: 'trends', label: 'Trendscraper', sub: 'Swarm Intelligence', icon: <TrendingUpIcon /> },
     { id: 'settings', label: 'Image Agent & Settings', sub: 'Multi-Engine & API Vault', icon: <TuneIcon /> },
     { id: 'governance', label: 'Review & Governance', sub: 'SLA Telemetry & Approvals', icon: <VerifiedUserIcon /> },
+    { id: 'ledger', label: 'Audit Ledger & Logins', sub: 'Trace Logins, Sessions & Ledger', icon: <SecurityIcon /> },
     { id: 'concierge', label: 'Ask Bourbon.AI', sub: 'AI Concierge & Status', icon: <SmartToyIcon /> },
   ];
 
@@ -241,14 +250,37 @@ export default function App() {
                 </Button>
               </Tooltip>
 
-              <Chip
-                icon={<CheckCircleIcon sx={{ fontSize: '14px !important' }} />}
-                label={healthStatus === 'ok' ? 'APIs Operational' : 'Offline Mode'}
-                color={healthStatus === 'ok' ? 'success' : 'warning'}
-                size="small"
-                variant="outlined"
-                sx={{ fontWeight: 700 }}
-              />
+              {/* Interactive Backend / Ngrok Cloud Endpoint Connector */}
+              <Tooltip title={
+                customEndpointInput
+                  ? `Connected to: ${customEndpointInput}. Click to change or disconnect.`
+                  : healthStatus === 'ok'
+                  ? 'Local Backend Active (http://localhost:8000). Click to configure Cloud/Ngrok URL.'
+                  : 'Operating in Sovereign Offline Client Mode. Click to connect your Ngrok tunnel.'
+              }>
+                <Chip
+                  icon={customEndpointInput ? <LinkIcon sx={{ fontSize: '14px !important', color: '#10B981' }} /> : <CheckCircleIcon sx={{ fontSize: '14px !important' }} />}
+                  label={
+                    customEndpointInput
+                      ? `Cloud: ${customEndpointInput.replace(/^https?:\/\//, '').slice(0, 18)}...`
+                      : healthStatus === 'ok'
+                      ? 'Local Port 8000'
+                      : 'Offline Mode (Click to Connect)'
+                  }
+                  color={customEndpointInput || healthStatus === 'ok' ? 'success' : 'warning'}
+                  size="small"
+                  variant="outlined"
+                  onClick={() => setEndpointModalOpen(true)}
+                  sx={{
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    '&:hover': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.08)'
+                    }
+                  }}
+                />
+              </Tooltip>
+
 
               {/* Telemetry Activity Log Exporter */}
               <Tooltip title="Export Live Activity & Login Audit Log (JSON)">
@@ -468,6 +500,7 @@ export default function App() {
             />
           )}
           {activeTab === 'kyc' && <BrandKYC clientData={clientData} onRefresh={fetchClientData} />}
+          {activeTab === 'ledger' && <TelemetryAuditLedger />}
           {activeTab === 'concierge' && <AskBourbon clientData={clientData} />}
           {activeTab === 'bbn_explorer' && <BbnFileExplorer clientData={clientData} />}
         </Box>
@@ -480,6 +513,80 @@ export default function App() {
             fetchClientData(newBrand);
           }}
         />
+
+        {/* CLOUD / NGROK BACKEND ENDPOINT MODAL */}
+        <Dialog
+          open={endpointModalOpen}
+          onClose={() => setEndpointModalOpen(false)}
+          PaperProps={{
+            sx: {
+              backgroundColor: '#14171F',
+              border: '1px solid rgba(245, 166, 35, 0.3)',
+              borderRadius: 3,
+              p: 1,
+              maxWidth: 520
+            }
+          }}
+        >
+          <DialogTitle sx={{ color: '#F5A623', fontWeight: 800 }}>
+            🌐 Connect Backend / Ngrok Cloud Tunnel
+          </DialogTitle>
+          <DialogContent>
+            <Typography variant="body2" sx={{ color: '#94A3B8', mb: 2 }}>
+              Paste your live backend URL (e.g. your active Ngrok tunnel or cloud API) so the GitHub Pages client can route Content Director chats, live Groq reasoning, and image generation to your server.
+            </Typography>
+
+            <Alert severity="info" sx={{ mb: 2.5, fontSize: '0.8rem' }}>
+              <strong>Active Ngrok Example:</strong> <code>https://happier-abstain-flaccid.ngrok-free.dev</code><br />
+              Leave blank to use default same-origin / local port 8000.
+            </Alert>
+
+            <TextField
+              fullWidth
+              size="small"
+              label="Backend Endpoint URL"
+              placeholder="https://xxxx.ngrok-free.dev"
+              value={customEndpointInput}
+              onChange={(e) => setCustomEndpointInput(e.target.value)}
+              InputProps={{
+                sx: { color: '#F0F3F6', backgroundColor: '#0B0D11' }
+              }}
+              InputLabelProps={{
+                sx: { color: '#94A3B8' }
+              }}
+            />
+          </DialogContent>
+          <DialogActions sx={{ px: 3, pb: 2 }}>
+            <Button
+              onClick={() => {
+                setApiBase('');
+                setCustomEndpointInput('');
+                setEndpointModalOpen(false);
+                location.reload();
+              }}
+              sx={{ color: '#EF4444', textTransform: 'none', fontWeight: 600 }}
+            >
+              Reset to Offline
+            </Button>
+            <Button
+              variant="contained"
+              onClick={() => {
+                setApiBase(customEndpointInput);
+                setEndpointModalOpen(false);
+                location.reload();
+              }}
+              sx={{
+                backgroundColor: '#F5A623',
+                color: '#121212',
+                fontWeight: 700,
+                textTransform: 'none',
+                '&:hover': { backgroundColor: '#E09612' }
+              }}
+            >
+              Save & Connect
+            </Button>
+          </DialogActions>
+        </Dialog>
 
       </Box>
     </ThemeProvider>
