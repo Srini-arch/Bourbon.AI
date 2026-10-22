@@ -170,6 +170,7 @@ export default function BrandKYC({ clientData, onRefresh }) {
         art_framing: rawVc.art_framing || UNBOX_ED_BRAND_DATA.visual_config.art_framing,
         env_background: rawVc.env_background || UNBOX_ED_BRAND_DATA.visual_config.env_background,
         env_subjects: rawVc.env_subjects || UNBOX_ED_BRAND_DATA.visual_config.env_subjects,
+        demographics_instruction: rawVc.demographics_instruction || UNBOX_ED_BRAND_DATA.visual_config.demographics_instruction,
         disallowed_visual_elements: disallowed
       }
     });
@@ -1394,6 +1395,18 @@ ${clean}
                     onChange={(e) => handleUpdateVisualConfig('env_subjects', e.target.value)}
                     placeholder="e.g. Confident children engaged in expressive communication, writing journals, and tactile games with mentors"
                     helperText="Focus on emotional posture, genuine interactions, and physical activities."
+                  />
+
+                  <TextField
+                    label="Demographics & Cultural Representation (AI Image Prompts)"
+                    fullWidth
+                    multiline
+                    rows={2}
+                    size="small"
+                    value={formData.visual_config?.demographics_instruction || ''}
+                    onChange={(e) => handleUpdateVisualConfig('demographics_instruction', e.target.value)}
+                    placeholder="e.g. Authentic modern South Asian, Indian children and mentors/teachers. In group photos, maintain majority South Asian students with 1 white child and 1 black child for inclusive representation."
+                    helperText="Strictly controls demographic generation across Cloudflare FLUX and Gemini diffusion engines."
                   />
 
                   {/* BRAND PALETTE SWATCHES */}

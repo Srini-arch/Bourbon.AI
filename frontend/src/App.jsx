@@ -44,7 +44,7 @@ import AdminLogin from './components/AdminLogin';
 import TelemetryAuditLedger from './components/TelemetryAuditLedger';
 import { UNBOX_ED_BRAND_DATA } from './data/defaultBrandData';
 import { logActivity, exportLogsAsFile } from './utils/telemetryLogger';
-import { getApiBase, setApiBase } from './apiConfig';
+import { getApiBase, setApiBase, API_BASE } from './apiConfig';
 import HistoryIcon from '@mui/icons-material/History';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import LinkIcon from '@mui/icons-material/Link';

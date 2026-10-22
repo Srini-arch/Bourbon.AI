@@ -150,7 +150,8 @@ export const UNBOX_ED_BRAND_DATA = {
     env_background: "Modern collaborative studio, warm study interior, wooden desk, books and tactile learning materials",
     env_density: "Balanced Minimalist",
     env_depth: "Shallow Bokeh with Focused Foreground Subject",
-    env_subjects: "Confident children engaged in expressive communication, writing journals, and tactile games with mentors",
+    env_subjects: "Confident modern South Asian and Indian children, educators and mentors engaged in expressive communication, writing journals, and tactile games; in group settings feature South Asian kids with 1 white child and 1 black child for natural diversity",
+    demographics_instruction: "Authentic modern South Asian, Indian children, parents, and educators/teachers. In group photos, maintain majority South Asian students with 1 white child and 1 black child for inclusive global representation.",
     disallowed_visual_elements: [
       "No readable text or typography",
       "No words, letters, or numbers",
